@@ -37,8 +37,14 @@ class ImageProcessor:
         alpha = self.add_alpha_channel()  # Alphakanal hinzufügen
         print("Alphakanal-Größe:", alpha.shape)
         print("Bildausschnitt-Größe:", patch.shape)
+        print("Logo Bildgröße:", self.logo.shape)
+        print("Hauptbild Größe:", self.main_image.shape)
+        alpha = 0.4
+        beta = 0.6
+        dst = cv.addWeighted(self.logo, alpha, patch, beta, 0.0)
+        cv.imshow('dst', dst)
         patch[alpha>0] = 0  # Alpha-Overlay auf den Bildausschnitt anwenden
-        patch += self.logo  # Logo in den Bildausschnitt einfügen
+        patch += dst  # Logo in den Bildausschnitt einfügen
         self.main_image[y_start:y_end, x_start:x_end, :] = patch  # Bildausschnitt mit Logo aktualisieren
 
     def show_image(self):

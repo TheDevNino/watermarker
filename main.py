@@ -6,7 +6,6 @@ def check_patch_dimensions(main_image, logo, x_start, y_start):
     logo_height, logo_width, _ = logo.shape
     x_end = x_start + logo_width
     y_end = y_start + logo_height
-
     return x_end <= main_image.shape[1] and y_end <= main_image.shape[0]
 
 def get_user_input(message, error_message):
@@ -100,12 +99,23 @@ def addLogo(processor, x_start, y_start):
 
 def addText(processor):
     font = cv.FONT_HERSHEY_SIMPLEX
-    bottomLeftCornerOfText = (10, 50)
-    fontScale = 1
+    x_start = get_integer_input(  #### Noch maximalwerte anzeigen lassen
+        "Gib die X-Startkoordinate für das Logo ein: ",
+        "Fehler: Bitte ganze Zahlen für die Koordinaten eingeben."
+    )
+    y_end = get_integer_input(
+        "Gib die Y-Endkoordinate für das Logo ein: ",
+        "Fehler: Bitte ganze Zahlen für die Koordinaten eingeben."
+    )
+    bottomLeftCornerOfText = (x_start, y_end)
+    fontScale = get_integer_input("Skalierung: ", "Falsche Eingabe.")
+    color_input = input("Farbe: Rot (r), Grün (g), Blau (b), Weiss (w), Schwarz (s)")
+
     fontColor = (0, 0, 0)
     thickness = 5
     lineType = 2
-    cv.putText(processor.main_image, processor.text,
+    cv.putText(processor.main_image,
+                processor.text,
                 bottomLeftCornerOfText,
                 font,
                 fontScale,
@@ -139,4 +149,7 @@ if __name__ == '__main__':
 Test Files:
 openCV/opencv_data/board.jpg
 openCV/opencv_data/opencv-logo.png
+openCV/opencv_data/WindowsLogo.jpg
+openCV/opencv_data/LinuxLogo.jpg
 '''
+

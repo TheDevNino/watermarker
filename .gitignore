@@ -1,0 +1,23 @@
+# Ignoriere temporäre Dateien und Ordner
+*~
+.DS_Store
+Thumbs.db
+
+# Ignoriere Ordner wie node_modules oder build/
+/node_modules
+/build
+
+# Ignoriere Konfigurationsdateien mit sensiblen Infos
+config.js
+.env
+
+# Ignoriere bestimmte Dateitypen
+*.log
+*.tmp
+
+# PyCharm-spezifische Dateien und Ordner
+.idea/
+*.iml
+
+# Ignoriere virtuelle Umgebungen
+venv/

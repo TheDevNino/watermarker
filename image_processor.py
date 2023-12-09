@@ -2,12 +2,16 @@ import cv2 as cv
 import numpy as np
 
 class ImageProcessor:
-    def __init__(self, main_image_path, logo_path):
+    def __init__(self, main_image_path, logo_path, text_input):
         self.main_image = cv.imread(main_image_path)            # Hauptbild laden
         self.main_image_height, self.main_image_width, _ = self.main_image.shape
 
-        self.logo = cv.imread(logo_path)                        # Logo laden
-        self.logo_height, self.logo_width, _ = self.logo.shape  # Höhe und Breite des Logos erhalten
+        if text_input == "":
+            self.logo = cv.imread(logo_path)                        # Logo laden
+            self.logo_height, self.logo_width, _ = self.logo.shape  # Höhe und Breite des Logos erhalten
+
+        if logo_path == "":
+            self.text = text_input
 
     # Funktionen der Klasse
     def get_main_image_dimensions(self):
@@ -29,16 +33,11 @@ class ImageProcessor:
     def insert_logo(self, x_start, y_start):
         x_end = x_start + self.logo_width       # X-Ende des Bildausschnitts berechnen
         y_end = y_start + self.logo_height      # Y-Ende des Bildausschnitts berechnen
-
         patch = self.main_image[y_start:y_end, x_start:x_end, :]  # Bildausschnitt erhalten
         alpha = self.add_alpha_channel()  # Alphakanal hinzufügen
-        #self.set_logo_opacity(150)  # Ändere die Deckkraft auf 150 (auf einer Skala von 0-255)
         print("Alphakanal-Größe:", alpha.shape)
         print("Bildausschnitt-Größe:", patch.shape)
-
         patch[alpha>0] = 0  # Alpha-Overlay auf den Bildausschnitt anwenden
-        # Alphakanal des Logos extrahieren
-
         patch += self.logo  # Logo in den Bildausschnitt einfügen
         self.main_image[y_start:y_end, x_start:x_end, :] = patch  # Bildausschnitt mit Logo aktualisieren
 

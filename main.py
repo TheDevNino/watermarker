@@ -2,9 +2,6 @@ import cv2 as cv            # Library zur Bildbearbeitung / -verarbeitung
 from pathlib import Path    # Library um Dateipfade zu prüfen
 from image_processor import ImageProcessor
 
-def check_file_path(file_path):
-    return Path(file_path).is_file()
-
 def check_patch_dimensions(main_image, logo, x_start, y_start):
     logo_height, logo_width, _ = logo.shape
     x_end = x_start + logo_width
@@ -55,21 +52,30 @@ def resize_images(processor):
     processor.resize_image(Xresized_main_image, Yresized_main_image)
     print(processor.get_image_sizes())
 
-def create_image_instances():
+def check_file_path(file_path):
+    return Path(file_path).is_file()
+
+def create_image_instances(needLogo):
     main_image_path = get_user_input(
         "Gib den Dateipfad des Hauptbildes ein: ",
         "Fehler: Dateipfad existiert nicht. Bitte erneut eingeben."
     )
-    logo_path = get_user_input(
-        "Gib den Dateipfad des Logos ein: ",
-        "Fehler: Dateipfad existiert nicht. Bitte erneut eingeben."
-    )
-    return ImageProcessor(main_image_path, logo_path)
+    if needLogo:
+        logo_path = get_user_input(
+            "Gib den Dateipfad des Logos ein: ",
+            "Fehler: Dateipfad existiert nicht. Bitte erneut eingeben."
+        )
+        text_input = ""
+    else:
+        logo_path = ""
+        text_input = input("Gib den Wasserzeichen-Text ein: ")
+    return ImageProcessor(main_image_path, logo_path, text_input)
 
-def run():
-    processor = create_image_instances()
-    resize_images(processor)
+def createText():
+    # ...
+    return
 
+def position_logo(processor):
     while True:
         try:
             x_start = get_integer_input(                                        #### Noch maximalwerte anzeigen lassen
@@ -83,12 +89,49 @@ def run():
             if not check_patch_dimensions(processor.main_image, processor.logo, x_start, y_start):
                 print("Fehler: Bildausschnittsdimensionen passen nicht zur Logo-Größe.")
             else:
-                processor.insert_logo(x_start, y_start)
-                processor.show_image()
-                print(processor.get_image_sizes())
                 break
         except ValueError:
             print("Fehler: Bitte ganze Zahlen für die Koordinaten eingeben.")
+    return x_start, y_start
+
+def addLogo(processor, x_start, y_start):
+    processor.insert_logo(x_start, y_start)
+    print(processor.get_image_sizes())
+
+def addText(processor):
+    font = cv.FONT_HERSHEY_SIMPLEX
+    bottomLeftCornerOfText = (10, 50)
+    fontScale = 1
+    fontColor = (0, 0, 0)
+    thickness = 5
+    lineType = 2
+    cv.putText(processor.main_image, processor.text,
+                bottomLeftCornerOfText,
+                font,
+                fontScale,
+                fontColor,
+                thickness,
+                lineType)
+
+def run():
+    while True:
+        type_request = input("Bild-Logo (b) oder Text-Logo (t) verwenden? ")
+        if type_request == "b":
+            needLogo = True
+            break
+        elif type_request == "t":
+            needLogo = False
+            break
+        else:
+            print("Eingabe Ungültig. Versuche es erneut.")
+    processor = create_image_instances(needLogo)
+    if needLogo:
+        resize_images(processor)
+        x, y = position_logo(processor)
+        addLogo(processor, x, y)
+    else:
+        addText(processor)
+    processor.show_image()
 
 if __name__ == '__main__':
     run()

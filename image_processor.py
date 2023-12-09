@@ -1,14 +1,22 @@
 import cv2 as cv
+import numpy as np
 
 class ImageProcessor:
     def __init__(self, main_image_path, logo_path):
         self.main_image = cv.imread(main_image_path)            # Hauptbild laden
+        self.main_image_height, self.main_image_width, _ = self.main_image.shape
+
         self.logo = cv.imread(logo_path)                        # Logo laden
         self.logo_height, self.logo_width, _ = self.logo.shape  # Höhe und Breite des Logos erhalten
 
+    # Funktionen der Klasse
+    def get_main_image_dimensions(self):
+        return self.main_image_height, self.main_image_width # Dimensionen zurückgeben
     def get_logo_dimensions(self):
         return self.logo_height, self.logo_width # Logo-Dimensionen zurückgeben
 
+    def resize_logo(self, width, height):
+        self.logo = cv.resize(self.logo, (width, height))  # Bildgröße ändern
     def resize_image(self, width, height):
         self.main_image = cv.resize(self.main_image, (width, height))  # Bildgröße ändern
 
@@ -24,10 +32,13 @@ class ImageProcessor:
 
         patch = self.main_image[y_start:y_end, x_start:x_end, :]  # Bildausschnitt erhalten
         alpha = self.add_alpha_channel()  # Alphakanal hinzufügen
+        #self.set_logo_opacity(150)  # Ändere die Deckkraft auf 150 (auf einer Skala von 0-255)
         print("Alphakanal-Größe:", alpha.shape)
         print("Bildausschnitt-Größe:", patch.shape)
 
-        patch[alpha > 0] = 0  # Alpha-Overlay auf den Bildausschnitt anwenden
+        patch[alpha>0] = 0  # Alpha-Overlay auf den Bildausschnitt anwenden
+        # Alphakanal des Logos extrahieren
+
         patch += self.logo  # Logo in den Bildausschnitt einfügen
         self.main_image[y_start:y_end, x_start:x_end, :] = patch  # Bildausschnitt mit Logo aktualisieren
 
@@ -41,3 +52,7 @@ class ImageProcessor:
             "Logo-Größe": self.logo.shape,
             "Bild-Größe": self.main_image.shape
         }  # Größeninformationen zurückgeben
+
+    def set_logo_opacity(self, alpha_value):
+        # ...
+        return

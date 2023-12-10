@@ -35,14 +35,18 @@ class ImageProcessor:
         y_end = y_start + self.logo_height
         patch = self.main_image[y_start:y_end, x_start:x_end, :]
 
-        alpha = self.add_alpha_channel()
-        mask = alpha[:, :, 0] > 0
+        alpha_channel = self.add_alpha_channel()
+        mask = alpha_channel[:, :, 0] > 0
 
         # Normalisiere den Alphakanal auf den Bereich [0, 1]
-        normalized_alpha = alpha[:, :, 0] / 255.0
+        normalized_alpha = alpha_channel[:, :, 0] / 255.0
 
-        alpha = 0.8
-        beta = 0.2
+        # Benutzereingabe für alpha
+        alpha = float(input("Wählen sie einen Wert für die Transparenz des Logos(zwischen 0.0 und 1.0): "))
+
+        # Setze den Wert für beta als 1 - alpha
+        beta = 1 - alpha
+
         dst = cv.addWeighted(self.logo.astype(np.uint8), alpha, patch.astype(np.uint8), beta, 0.0)
 
         # Setze die Pixel im Patch, die transparent sind, auf Schwarz

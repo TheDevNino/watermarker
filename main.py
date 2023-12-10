@@ -138,6 +138,7 @@ def run():
     if needLogo:
         resize_images(processor)
         x, y = position_logo(processor)
+
         addLogo(processor, x, y)
     else:
         addText(processor)

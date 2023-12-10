@@ -31,21 +31,29 @@ class ImageProcessor:
         return alpha
 
     def insert_logo(self, x_start, y_start):
-        x_end = x_start + self.logo_width       # X-Ende des Bildausschnitts berechnen
-        y_end = y_start + self.logo_height      # Y-Ende des Bildausschnitts berechnen
-        patch = self.main_image[y_start:y_end, x_start:x_end, :]  # Bildausschnitt erhalten
-        alpha = self.add_alpha_channel()  # Alphakanal hinzufügen
-        print("Alphakanal-Größe:", alpha.shape)
-        print("Bildausschnitt-Größe:", patch.shape)
-        print("Logo Bildgröße:", self.logo.shape)
-        print("Hauptbild Größe:", self.main_image.shape)
-        alpha = 0.4
-        beta = 0.6
-        dst = cv.addWeighted(self.logo, alpha, patch, beta, 0.0)
-        cv.imshow('dst', dst)
-        patch[alpha>0] = 0  # Alpha-Overlay auf den Bildausschnitt anwenden
-        patch += dst  # Logo in den Bildausschnitt einfügen
-        self.main_image[y_start:y_end, x_start:x_end, :] = patch  # Bildausschnitt mit Logo aktualisieren
+        x_end = x_start + self.logo_width
+        y_end = y_start + self.logo_height
+        patch = self.main_image[y_start:y_end, x_start:x_end, :]
+
+        alpha = self.add_alpha_channel()
+        mask = alpha[:, :, 0] > 0
+
+        # Normalisiere den Alphakanal auf den Bereich [0, 1]
+        normalized_alpha = alpha[:, :, 0] / 255.0
+
+        alpha = 0.8
+        beta = 0.2
+        dst = cv.addWeighted(self.logo.astype(np.uint8), alpha, patch.astype(np.uint8), beta, 0.0)
+
+        # Setze die Pixel im Patch, die transparent sind, auf Schwarz
+        patch[mask] = 0
+
+        # Skaliere dst um den normalisierten Alphakanal
+        dst = (dst * normalized_alpha[:, :, np.newaxis]).astype(np.uint8)
+
+        patch += dst
+
+        self.main_image[y_start:y_end, x_start:x_end, :] = patch
 
     def show_image(self):
         cv.imshow("Patched Image", self.main_image)  # Bild anzeigen

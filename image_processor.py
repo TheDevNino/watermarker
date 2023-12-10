@@ -8,7 +8,7 @@ class ImageProcessor:
 
         if text_input == "":
             self.logo = cv.imread(logo_path)                        # Logo laden
-            self.logo_height, self.logo_width, _ = self.logo.shape  # Höhe und Breite des Logos erhalten
+            self.set_logo_dimensions()
 
         if logo_path == "":
             self.text = text_input
@@ -16,13 +16,12 @@ class ImageProcessor:
     # Funktionen der Klasse
     def get_main_image_dimensions(self):
         return self.main_image_height, self.main_image_width # Dimensionen zurückgeben
-    def get_logo_dimensions(self):
-        return self.logo_height, self.logo_width # Logo-Dimensionen zurückgeben
+    def set_logo_dimensions(self):
+        self.logo_height, self.logo_width, _ = self.logo.shape
 
     def resize_logo(self, width, height):
         self.logo = cv.resize(self.logo, (width, height))  # Bildgröße ändern
-    def resize_image(self, width, height):
-        self.main_image = cv.resize(self.main_image, (width, height))  # Bildgröße ändern
+        self.set_logo_dimensions()
 
     def add_alpha_channel(self):
         gray = cv.cvtColor(self.logo, cv.COLOR_BGR2GRAY)  # Logo in Graustufen konvertieren
@@ -33,6 +32,7 @@ class ImageProcessor:
     def insert_logo(self, x_start, y_start):
         x_end = x_start + self.logo_width
         y_end = y_start + self.logo_height
+        print(x_end, y_end)
         patch = self.main_image[y_start:y_end, x_start:x_end, :]
 
         alpha_channel = self.add_alpha_channel()
@@ -46,6 +46,8 @@ class ImageProcessor:
 
         # Setze den Wert für beta als 1 - alpha
         beta = 1 - alpha
+
+        print(patch.shape, self.logo.shape)
 
         dst = cv.addWeighted(self.logo.astype(np.uint8), alpha, patch.astype(np.uint8), beta, 0.0)
 

@@ -24,31 +24,26 @@ def get_integer_input(message, error_message):
         else:
             return int(user_input)
 
-def get_min_scale_factor(logoX, logoY, imgX, imgY):
-    scaling_factor_width = logoX / imgX
-    scaling_factor_height = logoY / imgY
-    scaling_factor = max(scaling_factor_width, scaling_factor_height)
-    return round(scaling_factor, 2)
+def get_max_scale_factor(logoX, logoY, imgX, imgY):
+    scaling_factor_width = imgX / logoX
+    scaling_factor_height = imgY / logoY
+    scaling_factor = min(scaling_factor_width, scaling_factor_height)
+    return round(scaling_factor-0.01, 2) # Rundung - Verhinderung Rundungsfehler
 
 def resize_images(processor):
     print(processor.get_image_sizes())
-    scale_factor = float(input("Gib den Skalierungsfaktor für das Logo ein: "))
+    msf = get_max_scale_factor(processor.logo_width,processor.logo_height,processor.main_image_width,processor.main_image_height)
+    while True:
+        scale_factor = float(
+            input(f"Gib den Skalierungsfaktor für das Logo ein (max. {msf}): "))
+        if scale_factor <= msf:
+            break
+        else:
+            print(f"Der eingegebene Skalierungsfaktor ist zu groß. Bitte gib einen Wert kleiner oder gleich {msf} ein.")
     Xresized_logo = int(processor.logo_width * scale_factor)
     Yresized_loog = int(processor.logo_height * scale_factor)
     processor.resize_logo(Xresized_logo, Yresized_loog)
 
-    # Damit das Logo ins Hauotbild passt, muss das Hauptbild skaliert werden
-    msf = get_min_scale_factor(processor.logo_width,processor.logo_height,processor.main_image_width,processor.main_image_height)
-    while True:
-        scale_factor = float(
-            input(f"Gib den Skalierungsfaktor für das Hauptbild ein (mindestens {msf}): "))
-        if scale_factor >= msf:
-            break
-        else:
-            print(f"Der eingegebene Skalierungsfaktor ist zu klein. Bitte gib einen Wert größer oder gleich {msf} ein.")
-    Xresized_main_image = int(processor.main_image_width * scale_factor)
-    Yresized_main_image = int(processor.main_image_height * scale_factor)
-    processor.resize_image(Xresized_main_image, Yresized_main_image)
     print(processor.get_image_sizes())
 
 def check_file_path(file_path):
@@ -146,6 +141,7 @@ def run():
 
 if __name__ == '__main__':
     run()
+
 '''
 Test Files:
 openCV/opencv_data/board.jpg
@@ -153,4 +149,3 @@ openCV/opencv_data/opencv-logo.png
 openCV/opencv_data/WindowsLogo.jpg
 openCV/opencv_data/LinuxLogo.jpg
 '''
-

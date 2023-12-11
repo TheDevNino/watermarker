@@ -42,7 +42,12 @@ class ImageProcessor:
         normalized_alpha = alpha_channel[:, :, 0] / 255.0
 
         # Benutzereingabe für alpha
-        alpha = float(input("Wählen sie einen Wert für die Transparenz des Logos(zwischen 0.0 und 1.0): "))
+        while True:
+            alpha = float(input("Wählen sie einen Wert für die Transparenz des Logos (zwischen 0.0 und 1.0): "))
+            if alpha < 1.0 and alpha > 0.0:
+                break
+            else:
+                print("Der Wert muss zwischen 0.0 und 1.0 liegen.")
 
         # Setze den Wert für beta als 1 - alpha
         beta = 1 - alpha

@@ -174,6 +174,7 @@ def run():
     else:
         addText(processor)
     processor.show_image()
+    processor.save_image()
 
 if __name__ == '__main__':
     run()

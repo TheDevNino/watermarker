@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import os
 
 class ImageProcessor:
     def __init__(self, main_image_path, logo_path, text_input):
@@ -70,6 +71,21 @@ class ImageProcessor:
         cv.imshow("Patched Image", self.main_image)  # Bild anzeigen
         cv.waitKey(0)  # Warten, bis eine Taste gedrückt wird
         cv.destroyAllWindows()  # Alle Fenster schließen
+
+    def save_image(self):
+        # Filename
+        while True:
+            filename = input("Gib einen Dateinamen zum Abspeichern ein: ")
+            if len(filename) > 255:
+                print("Der Dateiname überschreitet die maximale Länge.")
+            else:
+                # Überprüfe die Existenz und Schreibbarkeit der Datei
+                if os.path.exists(filename):
+                    print("Die Datei existiert bereits.")
+                else:
+                    break
+
+        cv.imwrite(filename, self.main_image)
 
     def get_image_sizes(self):
         return {

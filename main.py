@@ -65,10 +65,6 @@ def create_image_instances(needLogo):
         text_input = input("Gib den Wasserzeichen-Text ein: ")
     return ImageProcessor(main_image_path, logo_path, text_input)
 
-def createText():
-    # ...
-    return
-
 def position_logo(processor):
     while True:
         try:
@@ -98,20 +94,30 @@ def addText(processor):
         "Gib die X-Startkoordinate für das Logo ein: ",
         "Fehler: Bitte ganze Zahlen für die Koordinaten eingeben."
     )
-    y_end = get_integer_input(
-        "Gib die Y-Endkoordinate für das Logo ein: ",
+    y_start = get_integer_input(
+        "Gib die Y-Startkoordinate für das Logo ein: ",
         "Fehler: Bitte ganze Zahlen für die Koordinaten eingeben."
     )
-    bottomLeftCornerOfText = (x_start, y_end)
     fontScale = get_integer_input("Skalierung: ", "Falsche Eingabe.")
-    color_input = input("Farbe: Rot (r), Grün (g), Blau (b), Weiss (w), Schwarz (s)")
+    #color_input = input("Farbe: Rot (r), Grün (g), Blau (b), Weiss (w), Schwarz (s)")
 
     fontColor = (0, 0, 0)
     thickness = 5
     lineType = 2
+
+    textSize = cv.getTextSize(
+        processor.text,
+        font,
+        fontScale,
+        thickness
+    )
+    print("Size:",textSize)
+
+    topRightCornerOfText = (x_start, y_start+int(textSize[0][1]))
+
     cv.putText(processor.main_image,
                 processor.text,
-                bottomLeftCornerOfText,
+               topRightCornerOfText,
                 font,
                 fontScale,
                 fontColor,

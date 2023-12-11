@@ -63,7 +63,12 @@ def create_image_instances(needLogo):
         text_input = ""
     else:
         logo_path = ""
-        text_input = input("Gib den Wasserzeichen-Text ein: ")
+        while True:
+            text_input = input("Gib den Wasserzeichen-Text ein: ")
+            if text_input == "":
+                print("Der Input darf nicht leer sein")
+            else:
+                break
     return ImageProcessor(main_image_path, logo_path, text_input)
 
 def position_logo(processor):
@@ -121,13 +126,11 @@ def addText(processor):
             print("Ungültige Eingabe. Wähle eine der vorgegebenen Farben.")
 
     while True:
-        opacity = float(input("Wählen sie einen Wert für die Transparenz des Logos (zwischen 0.0 und 1.0): "))
-        if opacity <= 1.0 and opacity >= 0.0:
+        opacity = float(input("Wählen sie einen Wert für die Transparenz des Logos (größer 0.0 und kleiner 1.0): "))
+        if opacity < 1.0 and opacity >= 0.0:
             break
         else:
             print("Der Wert muss zwischen 0.0 und 1.0 liegen.")
-
-    overlay = np.zeros_like(processor.main_image, dtype=np.uint8)
 
     thickness = 5
     lineType = 2
@@ -141,18 +144,28 @@ def addText(processor):
     #print("Size:",textSize)
 
     topRightCornerOfText = (x_start, y_start+int(textSize[0][1]))
+    overlay = np.zeros_like(processor.main_image, dtype=np.uint8)
 
     cv.putText(overlay,
                 processor.text,
-               topRightCornerOfText,
+                topRightCornerOfText,
                 font,
                 fontScale,
                 fontColor,
                 thickness,
                 lineType)
 
-    cv.addWeighted(overlay, opacity, processor.main_image, 1 - opacity, 0, processor.main_image)
+    mask = cv.cvtColor(overlay, cv.COLOR_BGR2GRAY)
+    mask = cv.threshold(mask, 1, 255, cv.THRESH_BINARY)[1]
+    mask = mask.astype(np.float32) * opacity / 255.0
 
+    foreground = overlay.astype(np.float32)
+    background = processor.main_image.astype(np.float32)
+
+    for c in range(0, 3):
+        background[:, :, c] = background[:, :, c] * (1 - mask) + foreground[:, :, c] * mask
+
+    processor.main_image = background.astype(np.uint8)
 
 def run():
     while True:
@@ -173,8 +186,8 @@ def run():
         addLogo(processor, x, y)
     else:
         addText(processor)
-    processor.show_image()
     processor.save_image()
+    processor.show_image()
 
 if __name__ == '__main__':
     run()

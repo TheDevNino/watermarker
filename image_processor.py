@@ -75,7 +75,7 @@ class ImageProcessor:
     def save_image(self):
         # Filename
         while True:
-            filename = input("Gib einen Dateinamen zum Abspeichern ein: ")
+            filename = input("Gib einen Dateinamen zum Abspeichern ein: ")+".png"
             if len(filename) > 255:
                 print("Der Dateiname überschreitet die maximale Länge.")
             else:
@@ -83,7 +83,9 @@ class ImageProcessor:
                 if os.path.exists(filename):
                     print("Die Datei existiert bereits.")
                 else:
+                    print(filename)
                     break
+
 
         cv.imwrite(filename, self.main_image)
 

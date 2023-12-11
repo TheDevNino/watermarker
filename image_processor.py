@@ -44,7 +44,7 @@ class ImageProcessor:
         # Benutzereingabe für alpha
         while True:
             alpha = float(input("Wählen sie einen Wert für die Transparenz des Logos (zwischen 0.0 und 1.0): "))
-            if alpha < 1.0 and alpha > 0.0:
+            if alpha <= 1.0 and alpha >= 0.0:
                 break
             else:
                 print("Der Wert muss zwischen 0.0 und 1.0 liegen.")
@@ -76,7 +76,3 @@ class ImageProcessor:
             "Logo-Größe": self.logo.shape,
             "Bild-Größe": self.main_image.shape
         }  # Größeninformationen zurückgeben
-
-    def set_logo_opacity(self, alpha_value):
-        # ...
-        return

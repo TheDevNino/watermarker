@@ -1,6 +1,7 @@
 import cv2 as cv            # Library zur Bildbearbeitung / -verarbeitung
 from pathlib import Path    # Library um Dateipfade zu prüfen
 from image_processor import ImageProcessor
+import numpy as np
 
 def check_patch_dimensions(main_image, logo, x_start, y_start):
     logo_height, logo_width, _ = logo.shape
@@ -119,6 +120,15 @@ def addText(processor):
         else:
             print("Ungültige Eingabe. Wähle eine der vorgegebenen Farben.")
 
+    while True:
+        opacity = float(input("Wählen sie einen Wert für die Transparenz des Logos (zwischen 0.0 und 1.0): "))
+        if opacity <= 1.0 and opacity >= 0.0:
+            break
+        else:
+            print("Der Wert muss zwischen 0.0 und 1.0 liegen.")
+
+    overlay = np.zeros_like(processor.main_image, dtype=np.uint8)
+
     thickness = 5
     lineType = 2
 
@@ -128,11 +138,11 @@ def addText(processor):
         fontScale,
         thickness
     )
-    print("Size:",textSize)
+    #print("Size:",textSize)
 
     topRightCornerOfText = (x_start, y_start+int(textSize[0][1]))
 
-    cv.putText(processor.main_image,
+    cv.putText(overlay,
                 processor.text,
                topRightCornerOfText,
                 font,
@@ -140,6 +150,9 @@ def addText(processor):
                 fontColor,
                 thickness,
                 lineType)
+
+    cv.addWeighted(overlay, opacity, processor.main_image, 1 - opacity, 0, processor.main_image)
+
 
 def run():
     while True:

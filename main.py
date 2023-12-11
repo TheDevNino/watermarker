@@ -99,9 +99,26 @@ def addText(processor):
         "Fehler: Bitte ganze Zahlen für die Koordinaten eingeben."
     )
     fontScale = get_integer_input("Skalierung: ", "Falsche Eingabe.")
-    #color_input = input("Farbe: Rot (r), Grün (g), Blau (b), Weiss (w), Schwarz (s)")
+    while True:
+        color_input = input("Farbe: Rot (r), Grün (g), Blau (b), Weiss (w), Schwarz (s)")
+        if color_input == "r":
+            fontColor = (0, 0, 255)
+            break
+        elif color_input == "g":
+            fontColor = (0, 255, 0)
+            break
+        elif color_input == "b":
+            fontColor = (255, 0, 0)
+            break
+        elif color_input == "w":
+            fontColor = (255, 255, 255)
+            break
+        elif color_input == "s":
+            fontColor = (0, 0, 0)
+            break
+        else:
+            print("Ungültige Eingabe. Wähle eine der vorgegebenen Farben.")
 
-    fontColor = (0, 0, 0)
     thickness = 5
     lineType = 2
 
